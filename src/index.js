@@ -8,7 +8,6 @@ import cssnano from 'cssnano'
 
 const WebpackRTLPlugin = function(options = {filename: false, options: {}, plugins: []}) {
   this.options = options
-  this.chunkHashs = {};
   this.pliginName = 'webpack-rtl-plugin';
 }
 
@@ -27,15 +26,7 @@ WebpackRTLPlugin.prototype.apply = function(compiler) {
   }
 
   compiler.hooks.emit.tap(this.pliginName, (compilation) => {
-    const changedChunks = compilation.chunks.filter((chunk) => {
-      const name = chunk.name || chunk.id;
-      const prevHash = this.chunkHashs[name];
-      const currHash = chunk.hash;
-      this.chunkHashs[name] = currHash;
-      return !prevHash || (currHash !== prevHash);
-    });
-
-    forEachOfLimit(changedChunks, 5, (chunk, key, cb) => {
+    forEachOfLimit(compilation.chunks, 5, (chunk, key, cb) => {
       var rtlFiles = [],
           cssnanoPromise = Promise.resolve()
 
